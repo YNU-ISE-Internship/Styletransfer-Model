@@ -18,3 +18,9 @@
   *  选取方法中
 - [ ] 生成指定风格的图片（需要传入源图片和目标图片prompt）
   *  选取方法中
+
+2024.1.10 update：
+ 添加了新的可选模型：
+  data_light 和 data_standard 可以分别使用 mobilenetV3 和 vgg19 生成带对应后缀的style文件
+  genarate 可以通过参数选择希望调用的模型和文件
+ 放弃了ViT
