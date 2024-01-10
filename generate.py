@@ -117,11 +117,11 @@ class Generate:
             #                              float(sum(styles_l)), float(tv_l)])
         return X
 
-    def __init__(self, path_style, path_image, image_shape):
+    def __init__(self, model_type, path_style, path_image, image_shape):
         # self.image_shape = (300, 450)
         self.image_shape = image_shape
         self.content_img = d2l.Image.open(path_image)
-        with open(path_style, "rb") as fp:
+        with open(path_style + "/style_" + model_type, "rb") as fp:
             Y = pickle.load(fp)
         self.style_Y = [0.1 * y1 + 0.9 * y2 for y1, y2 in zip(Y[1], Y[5])]
 
@@ -129,18 +129,23 @@ class Generate:
 
         self.rgb_mean = torch.tensor([0.485, 0.456, 0.406])
         self.rgb_std = torch.tensor([0.229, 0.224, 0.225])
-        self.style_layers, self.content_layers = [0, 5, 10, 19, 28], [25]
 
-        self.pretrained_net = torchvision.models.vgg19(pretrained=True)
-        net = nn.Sequential(*[self.pretrained_net.features[i] for i in
-                              range(max(self.content_layers + self.style_layers) + 1)])
+        if model_type == "standard":
+            self.style_layers, self.content_layers = [0, 5, 10, 19, 28], [25]
+            self.pretrained_net = torchvision.models.vgg19(pretrained=True)
+            net = nn.Sequential(*[self.pretrained_net.features[i] for i in
+                                range(max(self.content_layers + self.style_layers) + 1)])
+        elif model_type == "light":
+            self.style_layers, self.content_layers = [1, 2, 4, 7, 14], [4]
+            self.pretrained_net = torchvision.models.mobilenet_v3_large(pretrained=True)
+            net = nn.Sequential(*[self.pretrained_net.features[i] for i in
+                                  range(max(self.content_layers + self.style_layers) + 1)])
         self.net = net.to(self.device)
         self.net.eval()
 
 
-a = Generate("../yh/style", '../img/GOEY7(QY}M(H(PPY[]X3`82_tmb.jpg', (480, 600))
+a = Generate("light", "../yh", '../img/GOEY7(QY}M(H(PPY[]X3`82_tmb.jpg', (480, 600))
 output = a.train(num_epochs=2000, lr_decay_epoch=250)
 output_image = a.postprocess(output)  # Convert the tensor to an image
-output_image_path = 'generated_image.jpg'  # Specify the local path to save the image
+output_image_path = '../yh/generated_image.jpg'  # Specify the local path to save the image
 output_image.save(output_image_path)  # Save the image
-# content_X, contents_Y, styles_Y, device, 0.3, 500, 50
