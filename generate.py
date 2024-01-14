@@ -115,6 +115,7 @@ class Generate:
             #     animator.axes[1].imshow(self.postprocess(X))
             #     animator.add(epoch + 1, [float(sum(contents_l)),
             #                              float(sum(styles_l)), float(tv_l)])
+        print(l)
         return X
 
     def __init__(self, model_type, path_style, path_image, image_shape):
